@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiko Network Race Comparison</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <h1>Taiko<span>Network Race</span></h1>
+        </div>
+        <div class="network-info">
+            <div class="network-badge" id="network-badge">Connecting...</div>
+            <div class="explorer-link" id="explorer-link"></div>
+        </div>
+    </header>
+
+    <main>
+        <section class="setup-section" id="setup-section">
+            <h2>Connect Wallet</h2>
+            <div class="form-group">
+                <label for="private-key">Private Key</label>
+                <input type="password" id="private-key" placeholder="Enter your private key (stored locally only)">
+            </div>
+            <div class="form-group">
+                <label for="tx-count">Transaction Count</label>
+                <input type="number" id="tx-count" value="5" min="1" max="20" placeholder="Number of transactions to send">
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount (ETH)</label>
+                <input type="text" id="amount" value="0.0001" placeholder="Amount to send in ETH">
+            </div>
+            <button id="connect-wallet-btn" class="primary-btn">Connect Wallet</button>
+        </section>
+
+        <section class="race-section" id="race-section" style="display: none;">
+            <div class="wallet-info">
+                <div class="wallet-address" id="wallet-address">Not connected</div>
+                <button id="disconnect-btn" class="secondary-btn">Disconnect</button>
+            </div>
+
+            <div class="network-stats">
+                <div class="stat-box">
+                    <div class="stat-title">Preconf Transactions</div>
+                    <div class="stat-value" id="preconf-tx-count">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Hekla Transactions</div>
+                    <div class="stat-value" id="hekla-tx-count">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Avg. Preconf Time</div>
+                    <div class="stat-value" id="preconf-avg-time">0 sec</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Avg. Hekla Time</div>
+                    <div class="stat-value" id="hekla-avg-time">0 sec</div>
+                </div>
+            </div>
+
+            <div class="racetrack-container" id="racetrack-container">
+                <!-- Racetrack will be rendered here -->
+            </div>
+
+            <div class="race-controls">
+                <button id="start-race-btn" class="primary-btn">Start Race</button>
+                <button id="reset-race-btn" class="secondary-btn">Reset Race</button>
+            </div>
+
+            <div class="transaction-history">
+                <div class="history-container">
+                    <div class="history-column">
+                        <h3>Preconf Transactions</h3>
+                        <div id="preconf-history" class="history-list"></div>
+                    </div>
+                    <div class="history-column">
+                        <h3>Hekla Transactions</h3>
+                        <div id="hekla-history" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>This tool sends real transactions to compare confirmation speed between Preconf and Hekla networks. Your private key is never stored or transmitted.</p>
+    </footer>
+</div>
+
+<script src="race.js"></script>
+</body>
+</html>

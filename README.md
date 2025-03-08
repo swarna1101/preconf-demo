@@ -68,6 +68,7 @@ preconf-demo/
 | `npm run game` | Start transaction game server |
 | `npm run game:open` | Start game server and open in browser |
 | `npm run comparison` | Start network comparison tool |
+ | `npm run race`      | Start a race of tx between preconf devnet and hekla |
 
 ## Command Line Options
 
