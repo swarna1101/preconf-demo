@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiko Transaction Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <h1>Taiko<span>Transaction Game</span></h1>
+        </div>
+        <div class="network-info">
+            <div class="network-badge" id="network-badge">Connecting...</div>
+            <div class="explorer-link" id="explorer-link"></div>
+        </div>
+    </header>
+
+    <main>
+        <section class="setup-section" id="setup-section">
+            <h2>Connect Wallet</h2>
+            <div class="form-group">
+                <label for="private-key">Private Key</label>
+                <input type="password" id="private-key" placeholder="Enter your private key (stored locally only)">
+            </div>
+            <div class="form-group">
+                <label for="recipient">Recipient Address (optional)</label>
+                <input type="text" id="recipient" placeholder="Leave empty to send to yourself">
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount (ETH)</label>
+                <input type="text" id="amount" value="0.0001" placeholder="Amount to send in ETH">
+            </div>
+            <button id="connect-wallet-btn" class="primary-btn">Connect Wallet</button>
+        </section>
+
+        <section class="game-section" id="game-section" style="display: none;">
+            <div class="wallet-info">
+                <div class="wallet-address" id="wallet-address">Not connected</div>
+                <button id="disconnect-btn" class="secondary-btn">Disconnect</button>
+            </div>
+
+            <div class="transaction-button-container">
+                <div class="transaction-button" id="transaction-button">
+                    <span>TRANSACTION</span>
+                </div>
+            </div>
+
+            <div class="transaction-stats">
+                <div class="stat-box">
+                    <div class="stat-title">Transactions</div>
+                    <div class="stat-value" id="tx-count">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Success Rate</div>
+                    <div class="stat-value" id="success-rate">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">Avg. Confirm Time</div>
+                    <div class="stat-value" id="avg-confirm-time">0 sec</div>
+                </div>
+            </div>
+
+            <div class="transaction-history">
+                <h3>Transaction History</h3>
+                <div class="history-container" id="history-container">
+                    <!-- Transaction history will appear here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>This game sends real transactions with small amounts to visualize network performance. Your private key is never stored or transmitted.</p>
+    </footer>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

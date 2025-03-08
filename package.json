@@ -1,0 +1,27 @@
+{
+  "name": "preconf-testing",
+  "version": "1.0.0",
+  "description": "Taiko Preconf Network Testing Tools",
+  "main": "index.js",
+  "scripts": {
+    "transfer": "node scripts/run-transfer.js",
+    "transfer:preconf": "node scripts/run-transfer.js --network=preconf",
+    "transfer:hekla": "node scripts/run-transfer.js --network=hekla",
+    "robust": "node scripts/run-robust-transfer.js",
+    "deploy": "node scripts/run-deploy.js",
+    "defi": "node scripts/run-defi.js",
+    "game": "node scripts/run-game.js",
+    "game:open": "node scripts/run-game.js --open",
+    "comparison": "node scripts/run-comparison.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
+    "@uniswap/v2-periphery": "^1.1.0-beta.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^5.7.2",
+    "express": "^4.21.2",
+    "open": "^8.4.2"
+  }
+}

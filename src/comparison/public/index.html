@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiko Network Speed Comparison</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <h1>Taiko Network<span>Speed Comparison</span></h1>
+        </div>
+    </header>
+
+    <main>
+        <section class="setup-section" id="setup-section">
+            <h2>Connect Wallet</h2>
+            <div class="form-group">
+                <label for="private-key">Private Key</label>
+                <input type="password" id="private-key" placeholder="Enter your private key (stored locally only)">
+            </div>
+            <div class="form-group">
+                <label for="recipient">Recipient Address (optional)</label>
+                <input type="text" id="recipient" placeholder="Leave empty to send to yourself">
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount (ETH)</label>
+                <input type="text" id="amount" value="0.0001" placeholder="Amount to send in ETH">
+            </div>
+            <button id="connect-wallet-btn" class="primary-btn">Connect Wallet</button>
+        </section>
+
+        <section class="comparison-section" id="comparison-section" style="display: none;">
+            <div class="wallet-info">
+                <div class="wallet-address" id="wallet-address">Not connected</div>
+                <button id="disconnect-btn" class="secondary-btn">Disconnect</button>
+            </div>
+
+            <div class="network-cards">
+                <div class="network-card" id="preconf-card">
+                    <h2>Preconf Devnet</h2>
+                    <div class="network-details">
+                        <p><strong>RPC:</strong> <span id="preconf-rpc"></span></p>
+                        <p><strong>Explorer:</strong> <a id="preconf-explorer" target="_blank">View Explorer</a></p>
+                    </div>
+                    <div class="status" id="preconf-status">Ready to test</div>
+                    <!-- Progress bar container will be inserted here by JavaScript -->
+                    <div class="progress-container">
+                        <div class="progress-bar" id="preconf-progress-bar"></div>
+                    </div>
+                    <div class="test-result" id="preconf-result" style="display: none;">
+                        <div class="result-item">
+                            <div class="result-label">Confirmation Time</div>
+                            <div class="result-value" id="preconf-time">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Block Number</div>
+                            <div class="result-value" id="preconf-block">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Gas Used</div>
+                            <div class="result-value" id="preconf-gas">-</div>
+                        </div>
+                    </div>
+                    <button id="test-preconf-btn" class="network-btn">Test Preconf Network</button>
+                </div>
+
+                <div class="network-card" id="hekla-card">
+                    <h2>Taiko Hekla</h2>
+                    <div class="network-details">
+                        <p><strong>RPC:</strong> <span id="hekla-rpc"></span></p>
+                        <p><strong>Explorer:</strong> <a id="hekla-explorer" target="_blank">View Explorer</a></p>
+                    </div>
+                    <div class="status" id="hekla-status">Ready to test</div>
+                    <!-- Progress bar container will be inserted here by JavaScript -->
+                    <div class="progress-container">
+                        <div class="progress-bar" id="hekla-progress-bar"></div>
+                    </div>
+                    <div class="test-result" id="hekla-result" style="display: none;">
+                        <div class="result-item">
+                            <div class="result-label">Confirmation Time</div>
+                            <div class="result-value" id="hekla-time">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Block Number</div>
+                            <div class="result-value" id="hekla-block">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Gas Used</div>
+                            <div class="result-value" id="hekla-gas">-</div>
+                        </div>
+                    </div>
+                    <button id="test-hekla-btn" class="network-btn">Test Hekla Network</button>
+                </div>
+            </div>
+
+            <div class="comparison-actions">
+                <button id="compare-both-btn" class="primary-btn">Compare Both Networks</button>
+            </div>
+
+            <div class="comparison-result" id="comparison-result" style="display: none;">
+                <h2 class="comparison-title">Speed Comparison Results</h2>
+                <p class="comparison-metric">Speed Difference</p>
+                <div class="comparison-value" id="speed-difference">-</div>
+                <p>Network comparison</p>
+
+                <div class="bar-chart">
+                    <div class="bar preconf-bar" id="preconf-bar"></div>
+                    <div class="bar hekla-bar" id="hekla-bar"></div>
+                </div>
+
+                <table class="result-table">
+                    <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Helder (Preconf)</th>
+                        <th>Hekla</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Confirmation Time</td>
+                        <td id="result-preconf-time">-</td>
+                        <td id="result-hekla-time">-</td>
+                    </tr>
+                    <tr>
+                        <td>Gas Used</td>
+                        <td id="result-preconf-gas">-</td>
+                        <td id="result-hekla-gas">-</td>
+                    </tr>
+                    <tr>
+                        <td>Block Time</td>
+                        <td id="result-preconf-block">-</td>
+                        <td id="result-hekla-block">-</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>This tool sends real transactions with small amounts to compare network speed. Your private key is never stored or transmitted.</p>
+    </footer>
+</div>
+
+<script src="comparison.js"></script>
+</body>
+</html>
