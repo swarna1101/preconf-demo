@@ -14,6 +14,7 @@
     "game:open": "node scripts/run-game.js --open",
     "comparison": "node scripts/run-comparison.js",
     "race": "node scripts/run-race.js",
+    "flashnumbers": "node scripts/run-flashnumbers.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": true,

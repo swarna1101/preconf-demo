@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preconf Flash Numbers</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-container">
+    <header>
+        <div class="header-content">
+            <h1 class="logo">⚡ Preconf Flash Numbers</h1>
+            <div class="wallet-info">
+                <div id="wallet-address" class="wallet-address">Not connected</div>
+                <button id="disconnect-btn" class="secondary-btn" style="display:none;">Disconnect</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Setup Section -->
+        <section id="setup-section" class="setup-section">
+            <div class="setup-card">
+                <h2>Test Preconf's Lightning Speed</h2>
+                <p class="setup-description">Experience how Preconf devnet is up to 10x faster than standard networks through an interactive game.</p>
+
+                <div class="form-group">
+                    <label for="private-key">Private Key</label>
+                    <input type="password" id="private-key" placeholder="Enter your private key (stored locally only)">
+                </div>
+
+                <button id="connect-wallet-btn" class="primary-btn">Connect Wallet</button>
+            </div>
+        </section>
+
+        <!-- Game Section -->
+        <section id="game-section" class="game-section" style="display:none;">
+            <!-- Network Stats -->
+            <div class="networks-card">
+                <h3>Network Comparison</h3>
+                <div class="networks-info">
+                    <div class="network-info">
+                        <div class="network-name">Preconf</div>
+                        <div class="network-speed">~4s confirmation</div>
+                        <div class="network-badge fast-network">Fast Network</div>
+                    </div>
+                    <div class="network-info">
+                        <div class="network-name">Hekla</div>
+                        <div class="network-speed">~20s confirmation</div>
+                        <div class="network-badge">Standard Network</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Status -->
+            <div class="game-status-card">
+                <div id="game-message" class="game-message">Click Start Game to begin!</div>
+                <div id="game-timer" class="game-timer" style="display:none;">0.0s</div>
+                <button id="start-game-btn" class="primary-btn">Start Game</button>
+            </div>
+
+            <!-- Numbers Grid -->
+            <div id="numbers-grid" class="numbers-grid">
+                <!-- Numbers will be populated here -->
+            </div>
+
+            <!-- Game Results -->
+            <div id="game-results" class="game-results" style="display:none;">
+                <h3>Game Results</h3>
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-title">Game Time</div>
+                        <div id="game-time" class="result-value">0.0s</div>
+                    </div>
+                    <div class="result-box highlight">
+                        <div class="result-title">Speed Difference</div>
+                        <div id="speed-ratio" class="result-value">0x faster</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-title">Hekla Transaction</div>
+                        <div id="initial-tx-time" class="result-value">0ms</div>
+                        <div class="tx-hash" id="initial-tx-hash">-</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-title">Preconf Transaction</div>
+                        <div id="final-tx-time" class="result-value">0ms</div>
+                        <div class="tx-hash" id="final-tx-hash">-</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Timeout Modal -->
+    <div id="timeout-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Time's Up! ⏱️</h2>
+            </div>
+            <div class="modal-body">
+                <p>You need to be faster than that! Try again to test your reflexes.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="try-again-btn" class="primary-btn">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>This game sends real transactions to Preconf (fast) and Hekla (standard) networks to demonstrate speed differences.</p>
+        <p class="small">Your private key is never stored or transmitted beyond signing transactions.</p>
+    </footer>
+</div>
+
+<script src="flashnumbers.js"></script>
+</body>
+</html>
