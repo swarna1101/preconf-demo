@@ -70,7 +70,7 @@ preconf-demo/
 | `npm run comparison` | Start network comparison tool |
 | `npm run race`      | Start a race of tx between preconf devnet and hekla |
 | `npm run flashnumbers` | Test your reflexes against Preconf devnet |
-
+ | `npm run building` | Make buidlign block by block in both the network |
 ## Command Line Options
 
 Most scripts accept additional options:

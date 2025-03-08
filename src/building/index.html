@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiko Network Speed Comparison</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #ffffff, #fff0f8);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(45.89deg, #FFC6E9 6.48%, #FF6FC8 43.92%, #FFFFFF 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Comparison container */
+        .comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .comparison {
+                flex-direction: row;
+            }
+        }
+
+        /* Building container */
+        .building-container {
+            flex: 1;
+            border: 2px solid;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 450px;
+            position: relative;
+            background: linear-gradient(to bottom, #f0f8ff, #e0f0ff, #d0e8ff);
+        }
+
+        .preconf-container {
+            border-color: #FF6FC8;
+        }
+
+        .hekla-container {
+            border-color: #6B7280;
+        }
+
+        .network-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .preconf-badge {
+            background: linear-gradient(to right, #FFC6E9, #FF6FC8, white);
+            color: #FF6FC8;
+        }
+
+        .hekla-badge {
+            background: linear-gradient(to right, #D1D5DB, #6B7280);
+            color: #6B7280;
+        }
+
+        .block-time {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            height: 8px;
+            background-color: rgba(209, 213, 219, 0.2);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .progress-bar {
+            height: 100%;
+            transition: width 0.3s ease-out;
+        }
+
+        .preconf-progress {
+            background: linear-gradient(90deg, #FFC6E9, #FF6FC8);
+        }
+
+        .hekla-progress {
+            background: linear-gradient(90deg, #D1D5DB, #6B7280);
+        }
+
+        .progress-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-display {
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* Building selection */
+        .building-selection {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .building-button {
+            background: none;
+            border: 1px solid #FF6FC8;
+            color: #FF6FC8;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .building-button:hover {
+            background-color: rgba(255, 198, 233, 0.1);
+        }
+
+        .building-button.active {
+            background: linear-gradient(to right, #FFC6E9, #FF6FC8);
+            color: white;
+            border: none;
+        }
+
+        /* Comparison info */
+        .comparison-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid;
+            border-image: linear-gradient(45.89deg, #FFC6E9 6.48%, #FF6FC8 43.92%, #FFFFFF 100%) 1;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #FF6FC8;
+            margin-bottom: 15px;
+        }
+
+        .time-comparison {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .time-comparison {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .comparison-card {
+            background-color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-card:first-child {
+            border-color: #FFC6E9;
+        }
+
+        .comparison-card-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .comparison-card-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .comparison-card-value span {
+            font-weight: 700;
+        }
+
+        .comparison-card-value .preconf-value {
+            color: #FF6FC8;
+        }
+
+        .comparison-card-value .hekla-value {
+            color: #4b5563;
+        }
+
+        .comparison-note {
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 15px;
+        }
+
+        /* Restart button */
+        .restart-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .restart-button {
+            background: linear-gradient(to right, #FFC6E9, #FF6FC8);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .restart-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Building elements */
+        .building {
+            position: relative;
+            height: 90%;
+            width: 30%;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            margin-top: 5%;
+        }
+
+        .floor {
+            position: absolute;
+            background-color: #e0e0e0;
+            border: 1px solid #333;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.3s ease-out;
+        }
+
+        .floor.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Burj Khalifa specific styles */
+        .burj-base {
+            bottom: 0;
+            width: 100%;
+            height: 20%;
+            background-color: #b3e0ff;
+        }
+
+        .burj-middle {
+            bottom: 20%;
+            width: 60%;
+            height: 30%;
+            left: 20%;
+            background-color: #80d0ff;
+        }
+
+        .burj-upper {
+            bottom: 50%;
+            width: 40%;
+            height: 30%;
+            left: 30%;
+            background-color: #4db8ff;
+        }
+
+        .burj-top {
+            bottom: 80%;
+            width: 20%;
+            height: 10%;
+            left: 40%;
+            background-color: #1aa3ff;
+        }
+
+        .burj-spire {
+            bottom: 90%;
+            width: 2%;
+            height: 10%;
+            left: 49%;
+            background-color: #0077cc;
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+
+        .burj-spire.visible {
+            transform: scaleY(1);
+        }
+
+        /* Eiffel Tower specific styles */
+        .eiffel-base {
+            bottom: 0;
+            width: 100%;
+            height: 25%;
+            background-color: #666;
+        }
+
+        .eiffel-middle {
+            bottom: 25%;
+            width: 60%;
+            height: 30%;
+            left: 20%;
+            background-color: #777;
+        }
+
+        .eiffel-upper {
+            bottom: 55%;
+            width: 35%;
+            height: 25%;
+            left: 32.5%;
+            background-color: #888;
+        }
+
+        .eiffel-top {
+            bottom: 80%;
+            width: 15%;
+            height: 10%;
+            left: 42.5%;
+            background-color: #999;
+        }
+
+        .eiffel-spire {
+            bottom: 90%;
+            width: 2%;
+            height: 10%;
+            left: 49%;
+            background-color: #555;
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+
+        .eiffel-spire.visible {
+            transform: scaleY(1);
+        }
+
+        /* Empire State specific styles */
+        .empire-base {
+            bottom: 0;
+            width: 100%;
+            height: 10%;
+            background-color: #ffd699;
+        }
+
+        .empire-lower {
+            bottom: 10%;
+            width: 90%;
+            height: 30%;
+            left: 5%;
+            background-color: #ffcc80;
+        }
+
+        .empire-middle {
+            bottom: 40%;
+            width: 80%;
+            height: 35%;
+            left: 10%;
+            background-color: #ffbb33;
+        }
+
+        .empire-upper {
+            bottom: 75%;
+            width: 60%;
+            height: 15%;
+            left: 20%;
+            background-color: #ffa500;
+        }
+
+        .empire-top {
+            bottom: 90%;
+            width: 40%;
+            height: 5%;
+            left: 30%;
+            background-color: #cc8400;
+        }
+
+        .empire-spire {
+            bottom: 95%;
+            width: 2%;
+            height: 5%;
+            left: 49%;
+            background-color: #996300;
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+
+        .empire-spire.visible {
+            transform: scaleY(1);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+            padding: 20px 0;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .footer-link {
+            color: #FF6FC8;
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1 class="title">Taiko Network Speed Comparison</h1>
+        <p class="subtitle">
+            Experience the dramatic difference between Taiko's Preconf Devnet (~800ms) and Hekla (~2000ms)
+            by visualizing how these speeds would affect the construction of famous landmarks.
+        </p>
+    </header>
+
+    <div class="building-selection">
+        <button class="building-button active" data-building="burj">Burj Khalifa</button>
+        <button class="building-button" data-building="eiffel">Eiffel Tower</button>
+        <button class="building-button" data-building="empire">Empire State</button>
+    </div>
+
+    <div class="comparison">
+        <div class="building-container preconf-container">
+            <span class="network-badge preconf-badge">Preconf Devnet</span>
+            <span class="block-time">~800ms blocks</span>
+
+            <div class="building building-preconf">
+                <!-- Burj Khalifa elements -->
+                <div class="floor burj-base" data-floor="1"></div>
+                <div class="floor burj-middle" data-floor="7"></div>
+                <div class="floor burj-upper" data-floor="18"></div>
+                <div class="floor burj-top" data-floor="29"></div>
+                <div class="floor burj-spire" data-floor="40"></div>
+
+                <!-- Eiffel Tower elements (hidden initially) -->
+                <div class="floor eiffel-base" data-floor="1" style="display: none;"></div>
+                <div class="floor eiffel-middle" data-floor="9" style="display: none;"></div>
+                <div class="floor eiffel-upper" data-floor="18" style="display: none;"></div>
+                <div class="floor eiffel-top" data-floor="23" style="display: none;"></div>
+                <div class="floor eiffel-spire" data-floor="30" style="display: none;"></div>
+
+                <!-- Empire State elements (hidden initially) -->
+                <div class="floor empire-base" data-floor="1" style="display: none;"></div>
+                <div class="floor empire-lower" data-floor="3" style="display: none;"></div>
+                <div class="floor empire-middle" data-floor="10" style="display: none;"></div>
+                <div class="floor empire-upper" data-floor="20" style="display: none;"></div>
+                <div class="floor empire-top" data-floor="30" style="display: none;"></div>
+                <div class="floor empire-spire" data-floor="35" style="display: none;"></div>
+            </div>
+
+            <div class="progress-wrapper">
+                <div class="progress-container">
+                    <div class="progress-bar preconf-progress" style="width: 0%"></div>
+                </div>
+                <span class="time-display preconf-time">0s</span>
+            </div>
+        </div>
+
+        <div class="building-container hekla-container">
+            <span class="network-badge hekla-badge">Taiko Hekla</span>
+            <span class="block-time">~2000ms blocks</span>
+
+            <div class="building building-hekla">
+                <!-- Burj Khalifa elements -->
+                <div class="floor burj-base" data-floor="1"></div>
+                <div class="floor burj-middle" data-floor="7"></div>
+                <div class="floor burj-upper" data-floor="18"></div>
+                <div class="floor burj-top" data-floor="29"></div>
+                <div class="floor burj-spire" data-floor="40"></div>
+
+                <!-- Eiffel Tower elements (hidden initially) -->
+                <div class="floor eiffel-base" data-floor="1" style="display: none;"></div>
+                <div class="floor eiffel-middle" data-floor="9" style="display: none;"></div>
+                <div class="floor eiffel-upper" data-floor="18" style="display: none;"></div>
+                <div class="floor eiffel-top" data-floor="23" style="display: none;"></div>
+                <div class="floor eiffel-spire" data-floor="30" style="display: none;"></div>
+
+                <!-- Empire State elements (hidden initially) -->
+                <div class="floor empire-base" data-floor="1" style="display: none;"></div>
+                <div class="floor empire-lower" data-floor="3" style="display: none;"></div>
+                <div class="floor empire-middle" data-floor="10" style="display: none;"></div>
+                <div class="floor empire-upper" data-floor="20" style="display: none;"></div>
+                <div class="floor empire-top" data-floor="30" style="display: none;"></div>
+                <div class="floor empire-spire" data-floor="35" style="display: none;"></div>
+            </div>
+
+            <div class="progress-wrapper">
+                <div class="progress-container">
+                    <div class="progress-bar hekla-progress" style="width: 0%"></div>
+                </div>
+                <span class="time-display hekla-time">0s</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="comparison-info">
+        <h2 class="section-title">Real-World Construction Comparison</h2>
+        <div class="time-comparison">
+            <div class="comparison-card">
+                <div class="comparison-card-label">With Preconf Devnet Speeds:</div>
+                <div class="comparison-card-value">
+                    The <span id="building-name">Burj Khalifa</span> would only take <span class="preconf-value" id="preconf-time">2 years and 5 months</span> to build
+                </div>
+            </div>
+            <div class="comparison-card">
+                <div class="comparison-card-label">With Hekla Speeds:</div>
+                <div class="comparison-card-value">
+                    The <span id="building-name-2">Burj Khalifa</span> would take <span class="hekla-value" id="hekla-time">6 years</span> to build
+                </div>
+            </div>
+        </div>
+        <p class="comparison-note">
+            That's a 2.5× improvement in speed! What takes 2000ms on Hekla takes only 800ms on Preconf Devnet.
+        </p>
+    </div>
+
+    <div class="comparison-info">
+        <h2 class="section-title">Why Block Speed Matters</h2>
+        <p>
+            Faster block times mean quicker transaction confirmations, resulting in more
+            responsive dApps and a smoother user experience that feels more like traditional web applications.
+        </p>
+        <p>
+            With 2.5× faster block times, Preconf Devnet can process more transactions per second
+            than Hekla, enabling more scalable applications and services.
+        </p>
+    </div>
+
+    <div class="restart-container">
+        <button class="restart-button" id="restart-button">Restart Animation</button>
+    </div>
+
+    <footer class="footer">
+        <p>Created to demonstrate the speed difference between Taiko networks</p>
+        <div class="footer-links">
+            <a href="https://taiko.xyz" target="_blank" rel="noopener noreferrer" class="footer-link">taiko.xyz</a>
+            <a href="https://discord.gg/taikoxyz" target="_blank" rel="noopener noreferrer" class="footer-link">Discord</a>
+            <a href="https://github.com/taikoxyz" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // Building data
+    const buildings = {
+        burj: {
+            name: "Burj Khalifa",
+            floors: 40,
+            realConstructionMonths: 72, // 6 years
+            displayTime: "6 years"
+        },
+        eiffel: {
+            name: "Eiffel Tower",
+            floors: 30,
+            realConstructionMonths: 26, // 2 years, 2 months
+            displayTime: "2 years and 2 months"
+        },
+        empire: {
+            name: "Empire State Building",
+            floors: 35,
+            realConstructionMonths: 13, // 1 year and 45 days
+            displayTime: "1 year and 45 days"
+        }
+    };
+
+    // Network configuration
+    const networks = {
+        preconf: {
+            blockTime: 800, // 800ms per block
+            selector: '.building-preconf',
+            progressBar: '.preconf-progress',
+            timeDisplay: '.preconf-time'
+        },
+        hekla: {
+            blockTime: 2000, // 2000ms per block
+            selector: '.building-hekla',
+            progressBar: '.hekla-progress',
+            timeDisplay: '.hekla-time'
+        }
+    };
+
+    let selectedBuilding = 'burj';
+    let animationId = null;
+    let startTime = null;
+    let preconfFloors = 0;
+    let heklaFloors = 0;
+
+    // Initialize the animation
+    function initAnimation() {
+        // Update building names in comparison text
+        document.querySelectorAll('#building-name, #building-name-2').forEach(el => {
+            el.textContent = buildings[selectedBuilding].name;
+        });
+
+        // Calculate new construction times
+        const speedMultiplier = networks.hekla.blockTime / networks.preconf.blockTime; // 2.5
+        const preconfMonths = Math.round(buildings[selectedBuilding].realConstructionMonths / speedMultiplier);
+
+        // Format times for display
+        document.getElementById('hekla-time').textContent = buildings[selectedBuilding].displayTime;
+        document.getElementById('preconf-time').textContent = formatMonths(preconfMonths);
+
+        // Show only the selected building elements
+        document.querySelectorAll('.floor').forEach(floor => {
+            if (floor.className.includes(selectedBuilding)) {
+                floor.style.display = 'block';
+            } else {
+                floor.style.display = 'none';
+            }
+        });
+    }
+
+    // Format months into years and months
+    function formatMonths(months) {
+        const years = Math.floor(months / 12);
+        const remainingMonths = months % 12;
+
+        if (years === 0) {
+            return `${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}`;
+        } else if (remainingMonths === 0) {
+            return `${years} year${years !== 1 ? 's' : ''}`;
+        } else {
+            return `${years} year${years !== 1 ? 's' : ''} and ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}`;
+        }
+    }
+
+    // Reset the animation
+    function resetAnimation() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+
+        preconfFloors = 0;
+        heklaFloors = 0;
+        startTime = null;
+
+        // Reset progress bars
+        document.querySelector(networks.preconf.progressBar).style.width = '0%';
+        document.querySelector(networks.hekla.progressBar).style.width = '0%';
+
+        // Reset time displays
+        document.querySelector(networks.preconf.timeDisplay).textContent = '0s';
+        document.querySelector(networks.hekla.timeDisplay).textContent = '0s';
+
+        // Reset all floor visibilities
+        document.querySelectorAll('.floor').forEach(floor => {
+            floor.classList.remove('visible');
+        });
+
+        // Start animation
+        animationId = requestAnimationFrame(animate);
+    }
+
+    // Animation loop
+    function animate(timestamp) {
+        if (!startTime) {
+            startTime = timestamp;
+        }
+
+        const elapsed = timestamp - startTime;
+
+        // Calculate floors completed for each network
+        const totalFloors = buildings[selectedBuilding].floors;
+        const newPreconfFloors = Math.min(totalFloors, Math.floor(elapsed / networks.preconf.blockTime));
+        const newHeklaFloors = Math.min(totalFloors, Math.floor(elapsed / networks.hekla.blockTime));
+
+        // Update floors if changed
+        if (newPreconfFloors !== preconfFloors) {
+            updateBuilding(networks.preconf.selector, newPreconfFloors);
+            preconfFloors = newPreconfFloors;
+        }
+
+        if (newHeklaFloors !== heklaFloors) {
+            updateBuilding(networks.hekla.selector, newHeklaFloors);
+            heklaFloors = newHeklaFloors;
+        }
+
+        // Update progress bars
+        const preconfProgress = (preconfFloors / totalFloors) * 100;
+        const heklaProgress = (heklaFloors / totalFloors) * 100;
+
+        document.querySelector(networks.preconf.progressBar).style.width = `${preconfProgress}%`;
+        document.querySelector(networks.hekla.progressBar).style.width = `${heklaProgress}%`;
+
+        // Update time displays
+        const preconfTime = (preconfFloors * (networks.preconf.blockTime / 1000)).toFixed(1);
+        const heklaTime = (heklaFloors * (networks.hekla.blockTime / 1000)).toFixed(1);
+
+        document.querySelector(networks.preconf.timeDisplay).textContent = `${preconfTime}s`;
+        document.querySelector(networks.hekla.timeDisplay).textContent = `${heklaTime}s`;
+
+        // Continue animation if not complete
+        if (preconfFloors < totalFloors || heklaFloors < totalFloors) {
+            animationId = requestAnimationFrame(animate);
+        }
+    }
+
+    // Update building visualization
+    function updateBuilding(selector, completedFloors) {
+        const buildingElement = document.querySelector(selector);
+        const floors = buildingElement.querySelectorAll('.floor');
+
+        floors.forEach(floor => {
+            if (parseInt(floor.dataset.floor) <= completedFloors) {
+                floor.classList.add('visible');
+            } else {
+                floor.classList.remove('visible');
+            }
+        });
+    }
+
+    // Set up building selection buttons
+    document.querySelectorAll('.building-button').forEach(button => {
+        button.addEventListener('click', () => {
+            // Update active button
+            document.querySelectorAll('.building-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+
+            // Update selected building
+            selectedBuilding = button.dataset.building;
+
+            // Initialize and reset animation
+            initAnimation();
+            resetAnimation();
+        });
+    });
+
+    // Set up restart button
+    document.getElementById('restart-button').addEventListener('click', resetAnimation);
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        initAnimation();
+        resetAnimation();
+    });
+</script>
+</body>
+</html>
