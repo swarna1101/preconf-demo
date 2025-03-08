@@ -6,8 +6,8 @@ A comprehensive toolkit for testing and demonstrating Taiko network capabilities
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/preconf-testing.git
-cd preconf-testing
+git clone https://github.com/swarna1101/preconf-demo.git
+cd preconf-demo
 
 # Install dependencies
 npm install
