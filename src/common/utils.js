@@ -60,10 +60,70 @@ const logWithTime = (message) => {
     console.log(`[${formatTimestamp()}] ${message}`);
 };
 
+/**
+ * Format a number with commas as thousands separators
+ * @param {number} number - Number to format
+ * @returns {string} Formatted number
+ */
+const formatNumber = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+/**
+ * Shorten an address or hash for display
+ * @param {string} str - String to shorten
+ * @param {number} startChars - Number of characters to keep at start
+ * @param {number} endChars - Number of characters to keep at end
+ * @returns {string} Shortened string
+ */
+const shortenString = (str, startChars = 6, endChars = 4) => {
+    if (!str) return '';
+
+    if (str.length <= startChars + endChars + 3) {
+        return str;
+    }
+
+    if (endChars > 0) {
+        return `${str.substring(0, startChars)}...${str.substring(str.length - endChars)}`;
+    }
+
+    return str.substring(0, startChars) + '...';
+};
+
+/**
+ * Formats gas price in a human-readable way
+ * @param {ethers.BigNumber} gasPrice - Gas price in wei
+ * @returns {string} Formatted gas price (e.g. "5.2 Gwei")
+ */
+const formatGasPrice = (gasPrice) => {
+    return `${ethers.utils.formatUnits(gasPrice, 'gwei')} Gwei`;
+};
+
+/**
+ * Calculate optimal polling interval based on network characteristics and current state
+ * @param {string} networkId - Network identifier
+ * @param {number} pollCount - Current poll count
+ * @param {number} baseInterval - Base polling interval in ms
+ * @returns {number} Optimized polling interval in ms
+ */
+const calculatePollingInterval = (networkId, pollCount, baseInterval = 200) => {
+    // For faster networks (e.g., preconf), we want more frequent polling
+    if (networkId === 'preconf' || networkId === 'flashblock') {
+        return Math.max(100, baseInterval - (pollCount * 5));
+    }
+
+    // For standard networks, gradually increase the polling interval
+    return Math.min(500, baseInterval + (pollCount * 10));
+};
+
 module.exports = {
     delay,
     formatTimestamp,
     createWallets,
     calculateTimeDifference,
-    logWithTime
+    logWithTime,
+    formatNumber,
+    shortenString,
+    formatGasPrice,
+    calculatePollingInterval
 };

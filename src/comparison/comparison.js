@@ -183,6 +183,48 @@ async function runComparisonServer({
         }
     });
 
+    // API endpoint to get wallet info (address and nonces)
+    app.post('/api/wallet-info', async (req, res) => {
+        try {
+            const { privateKey } = req.body;
+
+            // Validate input
+            if (!privateKey) {
+                return res.status(400).json({ error: "Private key is required" });
+            }
+
+            // Create wallet instance
+            const wallet = new ethers.Wallet(privateKey);
+            const address = wallet.address;
+
+            // Get nonces from each network
+            const nonces = {};
+            for (const networkName of networks) {
+                try {
+                    const network = config.getNetwork(networkName);
+                    const provider = new ethers.providers.JsonRpcProvider(network.rpc);
+                    const connectedWallet = wallet.connect(provider);
+                    nonces[networkName] = await connectedWallet.getTransactionCount();
+                } catch (error) {
+                    console.error(`Error getting nonce for ${networkName}:`, error);
+                    nonces[networkName] = 0;
+                }
+            }
+
+            res.json({
+                success: true,
+                address,
+                nonces
+            });
+        } catch (error) {
+            console.error(`Error getting wallet info:`, error);
+            res.status(500).json({
+                success: false,
+                error: error.message
+            });
+        }
+    });
+
     // Start the server
     return new Promise((resolve) => {
         const server = app.listen(port, () => {

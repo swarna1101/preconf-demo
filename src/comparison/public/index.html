@@ -46,7 +46,7 @@
                         <p><strong>Explorer:</strong> <a id="preconf-explorer" target="_blank">View Explorer</a></p>
                     </div>
                     <div class="status" id="preconf-status">Ready to test</div>
-                    <!-- Progress bar container will be inserted here by JavaScript -->
+                    <!-- Progress bar container -->
                     <div class="progress-container">
                         <div class="progress-bar" id="preconf-progress-bar"></div>
                     </div>
@@ -74,7 +74,7 @@
                         <p><strong>Explorer:</strong> <a id="hekla-explorer" target="_blank">View Explorer</a></p>
                     </div>
                     <div class="status" id="hekla-status">Ready to test</div>
-                    <!-- Progress bar container will be inserted here by JavaScript -->
+                    <!-- Progress bar container -->
                     <div class="progress-container">
                         <div class="progress-bar" id="hekla-progress-bar"></div>
                     </div>
@@ -100,6 +100,96 @@
                 <button id="compare-both-btn" class="primary-btn">Compare Both Networks</button>
             </div>
 
+            <!-- Race track visualization will be inserted here by JavaScript -->
+            <div id="race-track-container" class="race-track-container" style="display: none;">
+                <h3 class="race-title">RACE: PRECONF VS HEKLA</h3>
+                <p class="race-subtitle">Watch transactions race to confirmation in real-time</p>
+
+                <div class="race-track">
+                    <!-- Track lanes -->
+                    <div class="track-lane preconf-lane">
+                        <div class="lane-label">PRECONF LANE</div>
+                        <div class="lane-time">~200ms</div>
+                    </div>
+                    <div class="track-lane hekla-lane">
+                        <div class="lane-label">HEKLA LANE</div>
+                        <div class="lane-time">~2s</div>
+                    </div>
+
+                    <!-- Start and finish lines -->
+                    <div class="start-line"></div>
+                    <div class="finish-line"></div>
+
+                    <!-- Transaction cars -->
+                    <div id="preconf-car" class="transaction-car preconf-car" style="display: none;">
+                        <div class="car-body">
+                            <div class="car-number">#0000</div>
+                            <div class="car-type">PRECONF</div>
+                        </div>
+                        <div class="car-trail"></div>
+                    </div>
+
+                    <div id="hekla-car" class="transaction-car hekla-car" style="display: none;">
+                        <div class="car-body">
+                            <div class="car-number">#0000</div>
+                            <div class="car-type">HEKLA</div>
+                        </div>
+                        <div class="car-trail"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Block statistics section -->
+            <div id="block-stats-container" class="block-stats-container" style="display: none;">
+                <h3 class="block-stats-title">Block Statistics</h3>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="15" rx="2" />
+                                <path d="M17 7V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v3" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">All Blocks</div>
+                            <div class="stat-value" id="total-blocks">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card preconf-stat">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Preconf Blocks</div>
+                            <div class="stat-value" id="preconf-blocks">0</div>
+                        </div>
+                        <div class="stat-badge">~200ms</div>
+                    </div>
+
+                    <div class="stat-card hekla-stat">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <path d="M9 9h6v6H9z" />
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Hekla Blocks</div>
+                            <div class="stat-value" id="hekla-blocks">0</div>
+                        </div>
+                        <div class="stat-badge">~2s</div>
+                    </div>
+                </div>
+
+                <div class="stats-note">
+                    Preconf blocks are processed up to 10x faster than Hekla blocks!
+                </div>
+            </div>
+
             <div class="comparison-result" id="comparison-result" style="display: none;">
                 <h2 class="comparison-title">Speed Comparison Results</h2>
                 <p class="comparison-metric">Speed Difference</p>
@@ -115,7 +205,7 @@
                     <thead>
                     <tr>
                         <th>Metric</th>
-                        <th>Helder (Preconf)</th>
+                        <th>Preconf</th>
                         <th>Hekla</th>
                     </tr>
                     </thead>
@@ -131,7 +221,7 @@
                         <td id="result-hekla-gas">-</td>
                     </tr>
                     <tr>
-                        <td>Block Time</td>
+                        <td>Block Number</td>
                         <td id="result-preconf-block">-</td>
                         <td id="result-hekla-block">-</td>
                     </tr>

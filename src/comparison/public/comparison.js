@@ -18,8 +18,10 @@ const state = {
             explorer: "https://helder-explorer-git-preconfs-taikoxyz.vercel.app",
             status: "ready",
             testInProgress: false,
+            isPolling: false, // Flag to prevent duplicate polling
             results: null,
-            progress: 0 // 0-100 progress value
+            progress: 0, // 0-100 progress value
+            blocksProcessed: 0 // Track simulated blocks
         },
         hekla: {
             name: "Taiko Hekla",
@@ -27,8 +29,10 @@ const state = {
             explorer: "https://hekla.taikoscan.io",
             status: "ready",
             testInProgress: false,
+            isPolling: false, // Flag to prevent duplicate polling
             results: null,
-            progress: 0 // 0-100 progress value
+            progress: 0, // 0-100 progress value
+            blocksProcessed: 0 // Track simulated blocks
         }
     },
     comparison: {
@@ -39,6 +43,12 @@ const state = {
     config: {
         recipient: null,
         amount: "0.0001"
+    },
+    stats: {
+        totalBlocks: 0,
+        preconfBlocks: 0,
+        heklaBlocks: 0,
+        lastBlockTime: Date.now()
     }
 };
 
@@ -47,7 +57,18 @@ const elements = {
     setupSection: document.getElementById('setup-section'),
     comparisonSection: document.getElementById('comparison-section'),
     comparisonResult: document.getElementById('comparison-result'),
+    raceTrackContainer: document.getElementById('race-track-container'),
+    blockStatsContainer: document.getElementById('block-stats-container'),
     walletAddress: document.getElementById('wallet-address'),
+
+    // Block stats elements
+    totalBlocks: document.getElementById('total-blocks'),
+    preconfBlocks: document.getElementById('preconf-blocks'),
+    heklaBlocks: document.getElementById('hekla-blocks'),
+
+    // Race track elements
+    preconfCar: document.getElementById('preconf-car'),
+    heklaCar: document.getElementById('hekla-car'),
 
     // Preconf network elements
     preconf: {
@@ -106,6 +127,9 @@ async function initializeComparison() {
 
         // Initialize progress bars
         initializeProgressBars();
+
+        // Start block simulator for statistics
+        startBlockSimulator();
     } catch (error) {
         console.error("Failed to initialize comparison:", error);
     }
@@ -143,13 +167,59 @@ function updateProgressBar(networkId, progress) {
             elements[networkId].progressBar.style.background = 'linear-gradient(to right, #FFC6E9, #FF6FC8, #FFFFFF)';
         }
     }
+
+    // Also update car position in race track
+    updateCarPosition(networkId, progress);
+}
+
+// Update car position in race track
+function updateCarPosition(networkId, progress) {
+    const car = document.getElementById(`${networkId}-car`);
+    if (!car) return;
+
+    // Calculate position (from 10% to 90%)
+    const position = 10 + (progress * 0.8);
+    car.style.left = `${position}%`;
+
+    // Enlarge trail based on speed
+    const trail = car.querySelector('.car-trail');
+    if (trail) {
+        const trailWidth = Math.min(100, 40 + (progress / 2));
+        trail.style.width = `${trailWidth}px`;
+        trail.style.opacity = progress > 80 ? '0.8' : '0.5';
+    }
+
+    // Add winner effect when car crosses finish line
+    if (progress >= 90 && !car.classList.contains('winner')) {
+        car.classList.add('winner');
+    }
 }
 
 // Fetch network information
 async function fetchNetworkInfo() {
     try {
-        // For now, using hardcoded values from state
-        // In a real implementation, you would fetch this from API
+        // Attempt to fetch network info from API
+        const response = await fetch('/api/networks');
+
+        // If successful, use the fetched data
+        if (response.ok) {
+            const data = await response.json();
+
+            // Update state with network information
+            Object.keys(data.networks).forEach(networkId => {
+                if (state.networks[networkId]) {
+                    state.networks[networkId].name = data.networks[networkId].name;
+                    state.networks[networkId].rpc = data.networks[networkId].rpc;
+                    state.networks[networkId].explorer = data.networks[networkId].explorer;
+                }
+            });
+
+            // Update default amount if provided
+            if (data.defaultAmount) {
+                state.config.amount = data.defaultAmount;
+                elements.amountInput.value = data.defaultAmount;
+            }
+        }
 
         // Update UI with network information
         elements.preconf.rpc.textContent = shortenString(state.networks.preconf.rpc);
@@ -157,8 +227,22 @@ async function fetchNetworkInfo() {
 
         elements.hekla.rpc.textContent = shortenString(state.networks.hekla.rpc);
         elements.hekla.explorer.href = state.networks.hekla.explorer;
+
+        // Initialize race track visualization
+        initializeRaceTrack();
     } catch (error) {
         console.error("Failed to fetch network info:", error);
+    }
+}
+
+// Initialize race track visualization
+function initializeRaceTrack() {
+    if (elements.raceTrackContainer) {
+        elements.raceTrackContainer.style.display = 'none'; // Initially hidden until race starts
+    }
+
+    if (elements.blockStatsContainer) {
+        elements.blockStatsContainer.style.display = 'none'; // Initially hidden until wallet connects
     }
 }
 
@@ -176,6 +260,51 @@ function setupEventListeners() {
 
     // Compare both networks button
     elements.compareBothBtn.addEventListener('click', compareBothNetworks);
+}
+
+// Start block simulator for statistics
+function startBlockSimulator() {
+    // Create block production intervals
+    // Preconf produces blocks faster (every 200ms)
+    const preconfInterval = setInterval(() => {
+        if (state.connected) {
+            state.networks.preconf.blocksProcessed++;
+            state.stats.preconfBlocks++;
+            state.stats.totalBlocks++;
+            updateBlockStats();
+        }
+    }, 200);
+
+    // Hekla produces blocks slower (every 2000ms)
+    const heklaInterval = setInterval(() => {
+        if (state.connected) {
+            state.networks.hekla.blocksProcessed++;
+            state.stats.heklaBlocks++;
+            state.stats.totalBlocks++;
+            updateBlockStats();
+        }
+    }, 2000);
+
+    // Clean up intervals on page unload
+    window.addEventListener('beforeunload', () => {
+        clearInterval(preconfInterval);
+        clearInterval(heklaInterval);
+    });
+}
+
+// Update block statistics display
+function updateBlockStats() {
+    if (elements.totalBlocks) {
+        elements.totalBlocks.textContent = state.stats.totalBlocks;
+    }
+
+    if (elements.preconfBlocks) {
+        elements.preconfBlocks.textContent = state.stats.preconfBlocks;
+    }
+
+    if (elements.heklaBlocks) {
+        elements.heklaBlocks.textContent = state.stats.heklaBlocks;
+    }
 }
 
 // Connect wallet function
@@ -203,6 +332,10 @@ function connectWallet() {
         elements.setupSection.style.display = 'none';
         elements.comparisonSection.style.display = 'block';
         elements.walletAddress.textContent = state.wallet.address;
+
+        // Show race track and block stats
+        elements.raceTrackContainer.style.display = 'block';
+        elements.blockStatsContainer.style.display = 'block';
 
         // Set connected state
         state.connected = true;
@@ -282,6 +415,8 @@ function disconnectWallet() {
     state.networks.hekla.status = "ready";
     state.networks.preconf.progress = 0;
     state.networks.hekla.progress = 0;
+    state.networks.preconf.isPolling = false;
+    state.networks.hekla.isPolling = false;
 
     // Reset comparison
     state.comparison = {
@@ -294,11 +429,32 @@ function disconnectWallet() {
     elements.setupSection.style.display = 'block';
     elements.comparisonSection.style.display = 'none';
     elements.comparisonResult.style.display = 'none';
+    elements.raceTrackContainer.style.display = 'none';
+    elements.blockStatsContainer.style.display = 'none';
     elements.privateKeyInput.value = '';
+
+    // Reset cars
+    if (elements.preconfCar) {
+        elements.preconfCar.style.display = 'none';
+        elements.preconfCar.classList.remove('winner');
+        elements.preconfCar.style.left = '10%';
+    }
+
+    if (elements.heklaCar) {
+        elements.heklaCar.style.display = 'none';
+        elements.heklaCar.classList.remove('winner');
+        elements.heklaCar.style.left = '10%';
+    }
 
     // Reset network UI
     resetNetworkUI('preconf');
     resetNetworkUI('hekla');
+
+    // Reset block stats
+    state.stats.totalBlocks = 0;
+    state.stats.preconfBlocks = 0;
+    state.stats.heklaBlocks = 0;
+    updateBlockStats();
 }
 
 // Reset network UI to default state
@@ -337,6 +493,12 @@ async function testNetwork(networkId, isDryRun = false) {
 
             // Update progress bar to 10%
             updateProgressBar(networkId, 10);
+
+            // Show race track if it's hidden
+            elements.raceTrackContainer.style.display = 'block';
+
+            // Show car for this network
+            prepareRaceCar(networkId);
         }
 
         // Prepare transaction data with nonce
@@ -402,6 +564,9 @@ async function testNetwork(networkId, isDryRun = false) {
             // Start timer for confirmation
             const startTime = Date.now();
 
+            // Update car number with transaction hash
+            updateRaceCarInfo(networkId, result.hash);
+
             // Poll for confirmation
             await pollForConfirmation(networkId, result.hash, startTime);
         } else {
@@ -428,6 +593,11 @@ async function testNetwork(networkId, isDryRun = false) {
 
             // Reset progress bar
             updateProgressBar(networkId, 0);
+
+            // Hide car
+            if (elements[`${networkId}-car`]) {
+                elements[`${networkId}-car`].style.display = 'none';
+            }
         }
     } catch (error) {
         if (isDryRun) return; // Silently return if it's a dry run
@@ -443,75 +613,162 @@ async function testNetwork(networkId, isDryRun = false) {
 
         // Reset progress bar
         updateProgressBar(networkId, 0);
+
+        // Hide car
+        if (elements[`${networkId}-car`]) {
+            elements[`${networkId}-car`].style.display = 'none';
+        }
     }
 }
 
-// Poll for transaction confirmation
-async function pollForConfirmation(networkId, txHash, startTime) {
-    let pollCount = 0;
-    const maxPolls = 60; // Maximum number of polling attempts
+// Prepare race car for a specific network
+function prepareRaceCar(networkId) {
+    const car = document.getElementById(`${networkId}-car`);
+    if (!car) return;
 
-    // Create a polling interval
-    const pollInterval = setInterval(async () => {
+    // Reset car position
+    car.style.left = '10%';
+    car.classList.remove('winner');
+
+    // Generate a random block number for visualization
+    const blockNumber = Math.floor(Math.random() * 10000);
+    car.querySelector('.car-number').textContent = `#${blockNumber}`;
+
+    // Show the car
+    car.style.display = 'block';
+}
+
+// Update race car info with transaction details
+function updateRaceCarInfo(networkId, txHash) {
+    const car = document.getElementById(`${networkId}-car`);
+    if (!car) return;
+
+    // Set transaction hash (shortened)
+    const shortHash = shortenString(txHash, 4, 4);
+    car.querySelector('.car-number').textContent = shortHash;
+}
+
+// Poll for transaction confirmation with optimized strategy
+async function pollForConfirmation(networkId, txHash, startTime) {
+    // Prevent duplicate polling
+    if (state.networks[networkId].isPolling) return;
+
+    state.networks[networkId].isPolling = true;
+
+    let pollCount = 0;
+    const maxPolls = 100; // Increased max polls since we're polling more frequently
+    const finishLine = 90; // Progress percentage that represents finish line
+
+    // Use dynamic polling intervals - poll more frequently at start
+    // Initial polls every 200ms, then gradually adjust based on network
+    let pollInterval = networkId === 'preconf' ? 200 : 400; // Faster polling for preconf
+    let currentProgress = 50; // Start at 50% progress (after sending TX)
+
+    // Flag to identify if we've seen the tx in the mempool
+    let seenInMempool = false;
+
+    // Update initial progress
+    updateProgressBar(networkId, currentProgress);
+
+    const pollTransaction = async () => {
         try {
             pollCount++;
 
-            // Progress increases with each poll, maxing at ~90%
-            const progressValue = Math.min(90, 50 + (pollCount * 40 / maxPolls));
-            updateProgressBar(networkId, progressValue);
+            // Adjust interval dynamically based on network and poll count
+            if (networkId === 'preconf') {
+                // For preconf, we expect faster confirmations, so keep polling frequent
+                pollInterval = Math.max(100, 200 - (pollCount * 5));
+                // Advance progress faster
+                currentProgress = Math.min(finishLine - 1, 50 + (pollCount * 4));
+            } else {
+                // For other networks, slow down polling a bit to reduce load
+                pollInterval = Math.min(500, 400 + (pollCount * 10));
+                // Advance progress more slowly
+                currentProgress = Math.min(finishLine - 5, 50 + (pollCount * 2));
+            }
+
+            // Update progress bar
+            updateProgressBar(networkId, currentProgress);
 
             // Check transaction status
             const response = await fetch(`/api/transaction/${networkId}/${txHash}`);
             const result = await response.json();
 
-            if (result.success && result.confirmed) {
-                // Transaction confirmed
-                clearInterval(pollInterval);
+            if (result.success) {
+                if (result.confirmed) {
+                    // Transaction confirmed
+                    const endTime = Date.now();
+                    const confirmationTime = endTime - startTime;
 
-                // Calculate confirmation time
-                const endTime = Date.now();
-                const confirmationTime = endTime - startTime;
+                    // Store results
+                    state.networks[networkId].results = {
+                        txHash,
+                        confirmationTime,
+                        blockNumber: result.receipt.blockNumber,
+                        gasUsed: result.receipt.gasUsed
+                    };
 
-                // Store results
-                state.networks[networkId].results = {
-                    txHash,
-                    confirmationTime,
-                    blockNumber: result.receipt.blockNumber,
-                    gasUsed: result.receipt.gasUsed
-                };
+                    state.networks[networkId].status = "confirmed";
+                    state.networks[networkId].isPolling = false;
+                    state.networks[networkId].testInProgress = false;
 
-                state.networks[networkId].status = "confirmed";
-                state.networks[networkId].testInProgress = false;
+                    // Update progress bar to 100%
+                    updateProgressBar(networkId, 100);
 
-                // Update progress bar to 100%
-                updateProgressBar(networkId, 100);
+                    // Update UI
+                    const network = elements[networkId];
+                    network.status.textContent = 'Transaction confirmed!';
+                    network.status.className = 'status success';
+                    network.result.style.display = 'block';
+                    network.time.textContent = `${confirmationTime} ms`;
+                    network.block.textContent = result.receipt.blockNumber;
+                    network.gas.textContent = result.receipt.gasUsed;
+                    network.testBtn.disabled = false;
 
-                // Update UI
-                const network = elements[networkId];
-                network.status.textContent = 'Transaction confirmed!';
-                network.status.className = 'status success';
-                network.result.style.display = 'block';
-                network.time.textContent = `${confirmationTime} ms`;
-                network.block.textContent = result.receipt.blockNumber;
-                network.gas.textContent = result.receipt.gasUsed;
-                network.testBtn.disabled = false;
+                    console.log(`Transaction confirmed on ${networkId} in ${confirmationTime}ms`);
 
-                console.log(`Transaction confirmed on ${networkId} in ${confirmationTime}ms`);
+                    // If comparison is in progress, check if both networks have completed
+                    if (state.comparison.inProgress) {
+                        checkComparisonStatus();
+                    }
 
-                // If comparison is in progress, check if both networks have completed
-                if (state.comparison.inProgress) {
-                    checkComparisonStatus();
+                    return true; // Polling complete
+                } else {
+                    // Transaction pending
+                    if (result.pending) {
+                        seenInMempool = true;
+
+                        // Update network status
+                        const network = elements[networkId];
+                        network.status.textContent = `Transaction in mempool, waiting for confirmation... (${pollCount})`;
+                    } else if (!seenInMempool) {
+                        // Update network status
+                        const network = elements[networkId];
+                        network.status.textContent = `Waiting for transaction to enter mempool... (${pollCount})`;
+                    }
+
+                    // Continue polling after delay
+                    setTimeout(pollTransaction, pollInterval);
                 }
-            } else if (pollCount >= maxPolls) {
-                // Timeout reached
-                clearInterval(pollInterval);
+            } else {
+                // Error checking transaction
+                console.error(`Error checking transaction on ${networkId}:`, result.error);
 
+                // Slow down polling on error
+                setTimeout(pollTransaction, pollInterval * 2);
+            }
+
+            // Check if we've reached max polls
+            if (pollCount >= maxPolls) {
+                console.log(`Polling timeout for ${networkId} after ${pollCount} attempts`);
+
+                state.networks[networkId].isPolling = false;
                 state.networks[networkId].testInProgress = false;
                 state.networks[networkId].status = "timeout";
 
                 // Update UI
                 const network = elements[networkId];
-                network.status.textContent = 'Confirmation timeout (2 minutes)';
+                network.status.textContent = 'Confirmation timeout';
                 network.status.className = 'status error';
                 network.testBtn.disabled = false;
 
@@ -522,18 +779,24 @@ async function pollForConfirmation(networkId, txHash, startTime) {
                 if (state.comparison.inProgress) {
                     checkComparisonStatus();
                 }
+
+                return false;
             }
         } catch (error) {
             console.error(`Error polling transaction on ${networkId}:`, error);
+
+            // Continue polling after a longer delay on error
+            setTimeout(pollTransaction, pollInterval * 2);
         }
-    }, 2000); // Poll every 2 seconds
+    };
 
-    // Set a timeout to stop polling after 2 minutes (to prevent endless polling)
+    // Start polling
+    pollTransaction();
+
+    // Set a safety timeout to stop polling after 2 minutes
     setTimeout(() => {
-        clearInterval(pollInterval);
-
-        // Check if transaction is still unconfirmed
-        if (state.networks[networkId].testInProgress) {
+        if (state.networks[networkId].isPolling) {
+            state.networks[networkId].isPolling = false;
             state.networks[networkId].testInProgress = false;
             state.networks[networkId].status = "timeout";
 
@@ -570,10 +833,24 @@ function compareBothNetworks() {
     state.networks.hekla.status = "ready";
     state.networks.preconf.progress = 0;
     state.networks.hekla.progress = 0;
+    state.networks.preconf.isPolling = false;
+    state.networks.hekla.isPolling = false;
 
     // Reset progress bars to be sure they're at 0
     updateProgressBar('preconf', 0);
     updateProgressBar('hekla', 0);
+
+    // Show race track for visualization
+    elements.raceTrackContainer.style.display = 'block';
+
+    // Reset cars
+    if (elements.preconfCar) {
+        elements.preconfCar.classList.remove('winner');
+    }
+
+    if (elements.heklaCar) {
+        elements.heklaCar.classList.remove('winner');
+    }
 
     // Set comparison in progress
     state.comparison.inProgress = true;
@@ -584,6 +861,10 @@ function compareBothNetworks() {
     elements.compareBothBtn.disabled = true;
     elements.preconf.testBtn.disabled = true;
     elements.hekla.testBtn.disabled = true;
+
+    // Prepare both cars for the race
+    prepareRaceCar('preconf');
+    prepareRaceCar('hekla');
 
     // Test both networks with a slight delay between them (helps with rate limiting issues)
     testNetwork('preconf');
@@ -696,11 +977,18 @@ function shortenAddress(address) {
 }
 
 // Helper function to shorten string (for RPC URLs)
-function shortenString(str) {
-    if (str.length > 30) {
-        return str.substring(0, 30) + '...';
+function shortenString(str, startChars = 30, endChars = 0) {
+    if (!str) return '';
+
+    if (str.length <= startChars + endChars + 3) {
+        return str;
     }
-    return str;
+
+    if (endChars > 0) {
+        return `${str.substring(0, startChars)}...${str.substring(str.length - endChars)}`;
+    }
+
+    return str.substring(0, startChars) + '...';
 }
 
 // Initialize on page load
