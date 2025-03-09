@@ -10,24 +10,34 @@ const networks = {
         name: "Taiko Preconf",
         rpc: process.env.PRECONF_RPC || "https://rpc.helder.taiko.xyz/",
         explorer: process.env.PRECONF_EXPLORER || "https://helder-explorer-git-preconfs-taikoxyz.vercel.app/address/",
-        gasMultiplier: parseFloat(process.env.GAS_MULTIPLIER || 1.1)
+        gasMultiplier: parseFloat(process.env.GAS_MULTIPLIER || 1.1),
+        expectedConfirmationTime: 200 // Average confirmation time in ms
     },
     hekla: {
         name: "Taiko Hekla",
         rpc: process.env.HEKLA_RPC || "https://rpc.hekla.taiko.xyz",
         explorer: process.env.HEKLA_EXPLORER || "https://hekla.taikoscan.io/address/",
-        gasMultiplier: parseFloat(process.env.GAS_MULTIPLIER || 1.1)
-    }
+        gasMultiplier: parseFloat(process.env.GAS_MULTIPLIER || 1.1),
+        expectedConfirmationTime: 2000 // Average confirmation time in ms
+    },
+
 };
 
 // Default network is preconf (or from env var)
 const defaultNetwork = process.env.DEFAULT_NETWORK || "preconf";
 
 // ETH amount to send (smaller amount per transaction)
-const defaultAmount = process.env.DEFAULT_AMOUNT || "0.001";
+const defaultAmount = process.env.DEFAULT_AMOUNT || "0.0001";
 
 // Number of transactions to send in batch operations
 const transactionCount = parseInt(process.env.TRANSACTION_COUNT || 5);
+
+// Polling configuration
+const polling = {
+    maxPolls: parseInt(process.env.MAX_POLLS || 100),
+    initialInterval: parseInt(process.env.INITIAL_POLL_INTERVAL || 200), // ms
+    timeout: parseInt(process.env.POLL_TIMEOUT || 60000) // 1 minute
+};
 
 // Wallet private keys - loaded from environment variables
 const keys = {
@@ -55,6 +65,7 @@ module.exports = {
     defaultNetwork,
     defaultAmount,
     transactionCount,
+    polling,
     keys,
 
     // Helper function to get network config
